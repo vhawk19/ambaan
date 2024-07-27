@@ -61,10 +61,38 @@ export default {
             }
             catch (error) {
                 this.isError = true
-                // outputElement.style.display = "block";
                 console.log("error")
                 this.errorMsg = `Error: ${error.message}`;
-                // exportButton.style.display = "none";
+            }
+        },
+        async exportCSV(data) {
+            if (!data || data.length === 0) {
+                alert("No data to export.");
+                return;
+            }
+            const headers = Object.keys(data[0]);
+            let csvContent = headers.join(",") + "\n";
+            data.forEach((row) => {
+                const values = headers.map((header) => {
+                    const cell = row[header] === null ? "" : row[header];
+                    return typeof cell === "string"
+                        ? `"${cell.replace(/"/g, "\"\"")}"`
+                        : cell;
+                });
+                csvContent += values.join(",") + "\n";
+            });
+            const blob = new Blob([csvContent], {
+                type: "text/csv;charset=utf-8;",
+            });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "query_result.csv");
+                link.style.visibility = "hidden";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         },
         runQueryBlock(blockId) {
@@ -75,31 +103,11 @@ export default {
             this.runQuery(queryInput, outputElement, exportButton);
         },
         displayTable(data, outputElement, exportButton) {
-            // outputElement.style.display = "block";
             if (this.data.length === 0) {
-                // this.outputElement = "This query returned no results.";
-                // exportButton.style.display = "none";
                 return;
             }
             this.headers = Object.keys(data[0]);
-            // let tableHtml = "<table><thead><tr>";
-            // headers.forEach((header) => {
-            //     tableHtml += `<th>${header}</th>`;
-            // });
-            // tableHtml += "</tr></thead><tbody>";
-            // data.slice(0, 5).forEach((row) => {
-            //     tableHtml += "<tr>";
-            //     headers.forEach((header) => {
-            //         tableHtml += `<td>${row[header]}</td>`;
-            //     });
-            //     tableHtml += "</tr>";
-            // });
-            // tableHtml += "</tbody></table>";
-            // if (this.data.length > 5) {
-            //     this.tableHtml += `<p>Showing 5 of ${data.length} rows.</p>`;
-            // }
-            // outputElement.innerHTML = tableHtml;
-            // exportButton.style.display = "inline-block";
+
         },
     }
 
