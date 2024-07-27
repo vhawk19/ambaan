@@ -1,0 +1,137 @@
+/* styles.css */
+body,
+html {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    line-height: 1.6;
+}
+.container {
+    display: flex;
+    height: 100%;
+}
+.data-catalog {
+    width: 30%;
+    background-color: #f0f0f0;
+    padding: 20px;
+    overflow-y: auto;
+}
+.query-workspace {
+    width: 70%;
+    padding: 20px;
+    overflow-y: auto;
+}
+h2 {
+    margin-top: 0;
+}
+input[type="file"],
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+button:hover {
+    background-color: #45a049;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+}
+.code-block {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+.output-block {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+.add-query-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    background-color: #f0f0f0;
+    border: 2px dashed #ccc;
+    color: #666;
+    padding: 10px;
+    cursor: pointer;
+}
+.add-query-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* New styles for schema display and rename form */
+.schema-display {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.schema-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.schema-table th, .schema-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.schema-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+.schema-table tr:last-child td {
+    border-bottom: none;
+}
+.rename-form {
+    display: flex;
+    margin-top: 10px;
+}
+.rename-form input[type="text"] {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+}
+.rename-form button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: 1px solid #4CAF50;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+.rename-form button:hover {
+    background-color: #45a049;
+}
