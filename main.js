@@ -5,6 +5,7 @@ import {
   runQueryBlock,
   updateVisualization,
   switchTab,
+  addVisualization,
 } from './queryBlocks.js'
 import {
   updateFileList,
@@ -33,6 +34,7 @@ async function init() {
   window.updateVisualization = updateVisualization
   window.switchTab = switchTab
   window.changePage = changePage
+  window.addVisualization = addVisualization
 }
 
 init()
