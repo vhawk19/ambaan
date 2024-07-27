@@ -5,7 +5,7 @@ import {
   runQueryBlock,
   updateVisualization,
   switchTab,
-  addVisualization,
+  addToDisplayPane,
 } from './queryBlocks.js'
 import {
   updateFileList,
@@ -14,18 +14,19 @@ import {
   renameTable,
 } from './dataCatalog.js'
 import { changePage } from './utils.js'
+import { initializeDisplayPane } from './displayPane.js'
 
 async function init() {
   await initDB()
   updateFileList()
   addQueryBlock() // Add an initial query block
+  initializeDisplayPane() // Initialize the display pane
 
   document.getElementById('importButton').addEventListener('click', importFile)
   document
     .getElementById('addQueryBtn')
     .addEventListener('click', addQueryBlock)
 
-  // Expose necessary functions to window for inline event handlers
   window.runQueryBlock = runQueryBlock
   window.importFile = importFile
   window.showSchema = showSchema
@@ -34,7 +35,7 @@ async function init() {
   window.updateVisualization = updateVisualization
   window.switchTab = switchTab
   window.changePage = changePage
-  window.addVisualization = addVisualization
+  window.addToDisplayPane = addToDisplayPane
 }
 
 init()

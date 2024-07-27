@@ -2,29 +2,37 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DuckDB-wasm Data Workspace</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambaan</title>
+    <link rel="stylesheet" href="/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <div class="data-catalog">
-            <h2>Data Catalog</h2>
-            <input type="file" id="fileInput" accept=".csv,.parquet" />
-            <button id="importButton">Import File</button>
-            <div id="tableList" class="table-list"></div>
+        <div class="data-catalog collapsible">
+            <h2 onclick="toggleCollapse('data-catalog')">Data Catalog <span class="collapse-icon">▼</span></h2>
+            <div class="content">
+                <input type="file" id="fileInput" accept=".csv,.parquet">
+                <button id="importButton">Import File</button>
+                <div id="fileList"></div>
+            </div>
         </div>
         <div class="query-workspace">
             <h2>Query Workspace</h2>
             <div id="queryBlocks"></div>
-            <div class="add-query-btn" id="addQueryBtn">+</div>
+            <div id="addQueryBtn" class="add-query-btn">+</div>
+        </div>
+        <div class="display-pane collapsible">
+            <h2 onclick="toggleCollapse('display-pane')">Display Pane <span class="collapse-icon">▼</span></h2>
+            <div class="content">
+                <div id="displayArea"></div>
+                <button id="exportPdfBtn">Export to PDF</button>
+            </div>
         </div>
     </div>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="/main.js"></script>
 </body>
 
 </html>

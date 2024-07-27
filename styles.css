@@ -307,3 +307,79 @@ button:hover {
   height: 400px;
   border: 1px solid #ddd;
 }
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.data-catalog {
+  width: 20%;
+  background-color: #f0f0f0;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.query-workspace {
+  width: 50%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.display-pane {
+  width: 30%;
+  background-color: #e0e0e0;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.draggable-viz {
+  cursor: move;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: white;
+}
+
+#displayArea {
+  min-height: 400px;
+  border: 2px dashed #999;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+#exportPdfBtn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#exportPdfBtn:hover {
+  background-color: #45a049;
+}
+
+.collapsible .content {
+  display: block;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.collapsible.collapsed .content {
+  max-height: 0;
+}
+
+.collapsible h2 {
+  cursor: pointer;
+}
+
+.collapse-icon {
+  float: right;
+  transition: transform 0.3s ease-out;
+}
+
+.collapsible.collapsed .collapse-icon {
+  transform: rotate(-90deg);
+}

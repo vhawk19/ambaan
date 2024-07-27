@@ -1,10 +1,29 @@
 // visualization.js
+import Chart from 'chart.js/auto'
+
 export function createVisualization(container, data, chartType, xAxis, yAxis) {
-  // Destroy existing chart if there is one
   if (container.chart) {
     container.chart.destroy()
   }
 
+  if (chartType === 'counter') {
+    createCounter(container, data, yAxis)
+  } else {
+    createChart(container, data, chartType, xAxis, yAxis)
+  }
+}
+function createCounter(container, data, yAxis) {
+  container.innerHTML = ''
+  const counterDiv = document.createElement('div')
+  counterDiv.className = 'counter'
+  const value = data.reduce(
+    (sum, item) => sum + parseFloat(item[yAxis] || 0),
+    0
+  )
+  counterDiv.textContent = value.toLocaleString()
+  container.appendChild(counterDiv)
+}
+function createChart(container, data, chartType, xAxis, yAxis) {
   const ctx = document.createElement('canvas')
   container.innerHTML = ''
   container.appendChild(ctx)

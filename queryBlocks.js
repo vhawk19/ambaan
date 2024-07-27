@@ -2,6 +2,7 @@
 import { conn } from './database.js'
 import { displayTable, exportCSV } from './utils.js'
 import { createVisualization } from './visualization.js'
+import { createDraggableVisualization } from './displayPane.js'
 
 let queryBlockCounter = 0
 let visualizationCounter = 0
@@ -13,12 +14,12 @@ export function addQueryBlock() {
   queryBlock.className = 'code-block'
   queryBlock.innerHTML = `
       <textarea id="${blockId}-input" rows="5" placeholder="Enter your SQL query here"></textarea>
-      <button onclick="runQueryBlock('${blockId}')">Run Query</button>
+      <button onclick="window.runQueryBlock('${blockId}')">Run Query</button>
       <div id="${blockId}-results" class="query-results" style="display: none;">
           <div class="tabs">
-              <button class="tab-button active" onclick="switchTab('${blockId}', 'table')">Table</button>
+              <button class="tab-button active" onclick="window.switchTab('${blockId}', 'table')">Table</button>
               <div id="${blockId}-viz-tabs"></div>
-              <button class="add-visualization-btn" onclick="addVisualization('${blockId}')">+</button>
+              <button class="add-visualization-btn" onclick="window.addVisualization('${blockId}')">+</button>
           </div>
           <div id="${blockId}-table-tab" class="tab-content active">
               <div id="${blockId}-output" class="output-block"></div>
@@ -29,8 +30,43 @@ export function addQueryBlock() {
       </div>
   `
   queryBlocksElement.appendChild(queryBlock)
-}
+  const savedVisualizations = getSavedVisualizations(blockId)
+  savedVisualizations.forEach((vizId) => {
+    addVisualization(blockId)
+    const name = getVisualizationName(blockId, vizId)
+    const settings = getVisualizationSettings(blockId, vizId)
 
+    // Update the visualization name
+    document.getElementById(`${vizId}-name`).value = name
+    document.querySelector(
+      `#${blockId}-viz-tabs button[data-viz-id="${vizId}"]`
+    ).textContent = name
+
+    // Update the visualization settings
+    if (settings.chartType) {
+      document.getElementById(`${vizId}-chart-type`).value = settings.chartType
+    }
+    if (settings.xAxis) {
+      document.getElementById(`${vizId}-x-axis`).value = settings.xAxis
+    }
+    if (settings.yAxis) {
+      document.getElementById(`${vizId}-y-axis`).value = settings.yAxis
+    }
+
+    // Recreate the visualization
+    updateVisualization(blockId, vizId)
+  })
+}
+function getSavedVisualizations(blockId) {
+  const visualizations = []
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i)
+    if (key.startsWith(`${blockId}-visualization-`) && key.endsWith('-name')) {
+      visualizations.push(key.split('-name')[0].split(`${blockId}-`)[1])
+    }
+  }
+  return visualizations
+}
 export function addVisualization(blockId) {
   const vizTabsContainer = document.getElementById(`${blockId}-viz-tabs`)
   const visualizationsContainer = document.getElementById(
@@ -38,31 +74,39 @@ export function addVisualization(blockId) {
   )
   const vizId = `visualization-${visualizationCounter++}`
 
-  // Add new visualization tab
-  const vizTab = document.createElement('button')
-  vizTab.className = 'tab-button'
-  vizTab.textContent = `Viz ${visualizationCounter}`
-  vizTab.onclick = () => switchTab(blockId, vizId)
-  vizTabsContainer.appendChild(vizTab)
+  // Create a new tab button
+  const tabButton = document.createElement('button')
+  tabButton.className = 'tab-button'
+  tabButton.textContent = `Viz ${visualizationCounter}`
+  tabButton.onclick = () => window.switchTab(blockId, vizId)
+  tabButton.dataset.vizId = vizId
+  vizTabsContainer.appendChild(tabButton)
 
-  // Add new visualization content
+  // Create visualization content
   const vizContent = document.createElement('div')
   vizContent.id = `${blockId}-${vizId}-content`
-  vizContent.className = 'tab-content visualization-block'
+  vizContent.className = 'tab-content'
   vizContent.innerHTML = `
-        <div class="visualization-options">
-            <select id="${vizId}-chart-type" onchange="updateVisualization('${blockId}', '${vizId}')">
-                <option value="bar">Bar Chart</option>
-                <option value="line">Line Chart</option>
-                <option value="pie">Pie Chart</option>
-                <option value="scatter">Scatter Plot</option>
-            </select>
-            <select id="${vizId}-x-axis" onchange="updateVisualization('${blockId}', '${vizId}')"></select>
-            <select id="${vizId}-y-axis" onchange="updateVisualization('${blockId}', '${vizId}')"></select>
-        </div>
-        <div id="${vizId}-chart-container" class="chart-container"></div>
-    `
+    <div class="visualization-options">
+      <input type="text" id="${vizId}-name" value="Visualization ${visualizationCounter}" onchange="window.renameVisualization('${blockId}', '${vizId}')">
+      <select id="${vizId}-chart-type" onchange="window.updateVisualization('${blockId}', '${vizId}')">
+        <option value="bar">Bar Chart</option>
+        <option value="line">Line Chart</option>
+        <option value="pie">Pie Chart</option>
+        <option value="scatter">Scatter Plot</option>
+        <option value="counter">Counter</option>
+        <option value="table">Table</option>
+      </select>
+      <select id="${vizId}-x-axis" onchange="window.updateVisualization('${blockId}', '${vizId}')"></select>
+      <select id="${vizId}-y-axis" onchange="window.updateVisualization('${blockId}', '${vizId}')"></select>
+    </div>
+    <div id="${vizId}-chart-container" class="chart-container"></div>
+    <button onclick="window.addToDisplayPane('${blockId}', '${vizId}')">Add to Display Pane</button>
+  `
   visualizationsContainer.appendChild(vizContent)
+
+  // Save the initial visualization name
+  saveVisualizationName(blockId, vizId, `Visualization ${visualizationCounter}`)
 
   // Populate column selects for the new visualization
   const data = JSON.parse(sessionStorage.getItem(`${blockId}-data`) || '[]')
@@ -80,7 +124,7 @@ export function addVisualization(blockId) {
   }
 
   // Switch to the new visualization tab
-  switchTab(blockId, vizId)
+  window.switchTab(blockId, vizId)
 }
 
 export function updateVisualization(blockId, vizId) {
@@ -92,7 +136,14 @@ export function updateVisualization(blockId, vizId) {
   // Retrieve data from session storage
   const data = JSON.parse(sessionStorage.getItem(`${blockId}-data`) || '[]')
 
-  createVisualization(chartContainer, data, chartType, xAxis, yAxis)
+  if (chartType === 'table') {
+    displayTable(data, chartContainer, null, vizId, 1)
+  } else {
+    createVisualization(chartContainer, data, chartType, xAxis, yAxis)
+  }
+
+  // Save visualization settings
+  saveVisualizationSettings(blockId, vizId, { chartType, xAxis, yAxis })
 }
 
 export async function runQueryBlock(blockId) {
@@ -159,33 +210,25 @@ export async function runQueryBlock(blockId) {
 }
 
 export function switchTab(blockId, tabName) {
-  setTimeout(() => {
-    const tableTab = document.getElementById(`${blockId}-table-tab`)
-    const tabButtons = document.querySelectorAll(
-      `#query-block-${blockId} .tab-button`
-    )
-    const visualizationContents = document.querySelectorAll(
-      `#${blockId}-visualizations-container .tab-content`
-    )
+  const tableTab = document.getElementById(`${blockId}-table-tab`)
+  const tabButtons = document.querySelectorAll(
+    `#${blockId}-results .tab-button`
+  )
+  const tabContents = document.querySelectorAll(
+    `#${blockId}-results .tab-content`
+  )
 
-    // Hide all tab contents
-    if (tableTab) tableTab.classList.remove('active')
-    visualizationContents.forEach((content) =>
-      content.classList.remove('active')
-    )
+  // Hide all tab contents and deactivate all tab buttons
+  tabContents.forEach((content) => content.classList.remove('active'))
+  tabButtons.forEach((button) => button.classList.remove('active'))
 
-    // Deactivate all tab buttons
-    tabButtons.forEach((button) => button.classList.remove('active'))
-
-    if (tabName === 'table') {
-      if (tableTab) tableTab.classList.add('active')
-      // Activate the first tab button (assumed to be the table tab)
-      if (tabButtons.length > 0) tabButtons[0].classList.add('active')
-    } else {
-      const vizContent = document.getElementById(
-        `${blockId}-${tabName}-content`
-      )
-      if (vizContent) vizContent.classList.add('active')
+  if (tabName === 'table') {
+    tableTab.classList.add('active')
+    tabButtons[0].classList.add('active')
+  } else {
+    const vizContent = document.getElementById(`${blockId}-${tabName}-content`)
+    if (vizContent) {
+      vizContent.classList.add('active')
       // Find and activate the corresponding tab button
       tabButtons.forEach((button) => {
         if (button.textContent === `Viz ${tabName.split('-')[1]}`) {
@@ -193,10 +236,25 @@ export function switchTab(blockId, tabName) {
         }
       })
     }
-  }, 0)
+  }
 }
 
-// Helper function to generate a report (you can expand this as needed)
+export function renameVisualization(blockId, vizId) {
+  const newName = document.getElementById(`${vizId}-name`).value
+  const tabButton = document.querySelector(
+    `#${blockId}-viz-tabs button[data-viz-id="${vizId}"]`
+  )
+  if (tabButton) {
+    tabButton.textContent = newName
+  }
+
+  // Save the new name
+  saveVisualizationName(blockId, vizId, newName)
+
+  // Record the renaming event
+  recordEvent('rename_visualization', { blockId, vizId, newName })
+}
+
 export function generateReport(blockId) {
   const data = JSON.parse(sessionStorage.getItem(`${blockId}-data`) || '[]')
   const visualizationsContainer = document.getElementById(
@@ -228,3 +286,47 @@ export function generateReport(blockId) {
 
   console.log(report)
 }
+export function addToDisplayPane(blockId, vizId) {
+  const displayArea = document.getElementById('displayArea')
+  const draggableViz = createDraggableVisualization(blockId, vizId)
+  displayArea.appendChild(draggableViz)
+}
+
+function saveVisualizationName(blockId, vizId, name) {
+  const key = `${blockId}-${vizId}-name`
+  sessionStorage.setItem(key, name)
+}
+function saveVisualizationSettings(blockId, vizId, settings) {
+  const key = `${blockId}-${vizId}-settings`
+  sessionStorage.setItem(key, JSON.stringify(settings))
+}
+
+function getVisualizationName(blockId, vizId) {
+  const key = `${blockId}-${vizId}-name`
+  return sessionStorage.getItem(key) || `Visualization ${vizId.split('-')[1]}`
+}
+
+function getVisualizationSettings(blockId, vizId) {
+  const key = `${blockId}-${vizId}-settings`
+  return JSON.parse(sessionStorage.getItem(key) || '{}')
+}
+
+function recordEvent(eventName, eventData) {
+  const events = JSON.parse(sessionStorage.getItem('events') || '[]')
+  events.push({
+    timestamp: new Date().toISOString(),
+    eventName,
+    eventData,
+  })
+  sessionStorage.setItem('events', JSON.stringify(events))
+  console.log(`Event recorded: ${eventName}`, eventData)
+}
+
+window.addVisualization = addVisualization
+window.updateVisualization = updateVisualization
+window.runQueryBlock = runQueryBlock
+window.switchTab = switchTab
+window.addToDisplayPane = addToDisplayPane
+window.renameVisualization = renameVisualization
+window.getVisualizationName = getVisualizationName
+window.getVisualizationSettings = getVisualizationSettings
