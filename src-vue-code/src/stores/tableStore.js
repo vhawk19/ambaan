@@ -5,7 +5,9 @@ export const useTableStore = defineStore('table', () => {
   async function showSchema(tableName) {
     try {
       const result = await conn.query(`DESCRIBE ${tableName}`)
+      console.log("res", result.toArray())
       return result.toArray()
+
     } catch (error) {
       console.error('Error fetching schema:', error)
       throw error

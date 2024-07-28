@@ -9,7 +9,7 @@
         />
       </div>
       <div 
-        class="add-query-btn mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer text-center"
+        class="add-query-btn mt-4 bg-white hover:bg-green-600 text-green-600 font-bold py-2 px-4 rounded cursor-pointer text-center"
         @click="addQueryBlock"
       >
         + Add Query Block
@@ -37,3 +37,9 @@
     }
   }
   </script>
+
+<style>
+.add-query-btn {
+  max-width: 20%;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="app-container">
+    <div class="app-container m-0">
       <div class="flex h-screen w-full overflow-hidden bg-gray-900 text-white">
         <!-- Data Catalog -->
         <div 
@@ -14,7 +14,7 @@
           <!-- Toggle button for Data Catalog -->
           <div 
             @click="toggleDataCatalog" 
-            :class="['cursor-pointer flex items-center justify-center w-6 bg-green-500 hover:bg-green-600 transition-colors',
+            :class="['cursor-pointer flex items-center justify-center w-6 transition-colors',
                      isDataCatalogVisible ? 'rotate-0' : 'rotate-180']"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,7 +30,7 @@
           <!-- Toggle button for Display Pane -->
           <div 
             @click="toggleDisplayPane" 
-            :class="['cursor-pointer flex items-center justify-center w-6 bg-green-500 hover:bg-green-600 transition-colors',
+            :class="['cursor-pointer flex items-center justify-center w-6 transition-colors',
                      isDisplayPaneVisible ? 'rotate-180' : 'rotate-0']"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

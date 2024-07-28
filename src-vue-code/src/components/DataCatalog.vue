@@ -8,22 +8,23 @@
             id="file-upload"
             type="file"
             ref="fileInput"
+            v-bind="fileInput"
             accept=".csv,.parquet"
-            @change="handleFileChange"
+            v-on:change="importFile"
             class="block w-full text-sm text-gray-500
                    file:mr-4 file:py-2 file:px-4
-                   file:rounded-full file:border-0
+                   file:border-0
                    file:text-sm file:font-semibold
-                   file:bg-blue-50 file:text-blue-700
-                   hover:file:bg-blue-100"
+                   file:bg-blue-50 file:text-green-700
+                   hover:file:bg-green-100"
           />
         </label>
-        <button
+        <!-- <button
           @click="importFile"
           class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
           Import File
-        </button>
+        </button> -->
       </div>
       <div id="fileList">
         <h3 class="text-xl font-semibold mb-2">Imported Files:</h3>
@@ -44,13 +45,13 @@
                 </button>
                 <button
                   @click="showRenameForm(file.tableName)"
-                  class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-sm"
+                  class="w-full bg-white hover:bg-white text-green-500 font-bold py-1 px-2 rounded text-sm"
                 >
                   Rename Table
                 </button>
               </div>
               <div v-if="file.showSchema" class="schema-display mt-2">
-                <table v-if="file.schemaData.length > 0" class="w-full text-sm">
+                <table v-if="schemaInfo" class="w-full text-sm">
                   <thead>
                     <tr>
                       <th class="text-left">Column Name</th>
@@ -58,7 +59,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="row in file.schemaData" :key="row.column_name">
+                    <tr v-for="row in schemaInfo.target" :key="row.column_name">
                       <td>{{ row.column_name }}</td>
                       <td>{{ row.column_type }}</td>
                     </tr>
@@ -101,19 +102,21 @@
         fileStore,
         tableStore,
         db,
-        conn
+        conn,
       }
     },
     data() {
       return {
-        selectedFile: null
+        selectedFile: null,
+        schemaInfo: []
       }
     },
     methods: {
-      handleFileChange(event) {
+      // handleFileChange(event) {
+      //   this.selectedFile = event.target.files[0];
+      // },
+      async importFile(event) {
         this.selectedFile = event.target.files[0];
-      },
-      async importFile() {
         if (!this.selectedFile) {
           alert("Please select a file to import.");
           return;
@@ -134,8 +137,12 @@
     if (file.showSchema) {
       try {
         const schemaData = await this.tableStore.showSchema(tableName);
-        file.schemaData = schemaData;
-        file.schemaError = '';
+        this.schemaInfo = schemaData
+        // file.schemaData = schemaData;
+        // file.schemaError = '';
+        console.log("schema")
+        console.log(this.schemaInfo)
+        this.schemaInfo.forEach((row => console.log(row)))
       } catch (error) {
         console.error('Error fetching schema:', error);
         file.schemaError = 'Error fetching schema';

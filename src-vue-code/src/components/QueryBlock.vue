@@ -8,13 +8,13 @@
       <div class="flex justify-between">
         <button
           @click="executeQuery"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
         >
           Execute Query
         </button>
         <button
           @click="clearQuery"
-          class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+          class="bg-white hover:bg-white text-green-500 font-bold py-2 px-4 rounded"
         >
           Clear Query
         </button>
