@@ -10,7 +10,7 @@
         <button @click="runQueryBlock" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
           Run Query
         </button>
-        <button @click="clearQueryBlock" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+        <button @click="clearQueryBlock" class="bg-white text-green-600 font-bold py-2 px-4 rounded">
           Clear Query
         </button>
       </div>
@@ -21,10 +21,10 @@
             <button @click="addVisualization" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
               Add Visualization
             </button>
-            <button @click="addToDisplayPane" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            <button @click="addToDisplayPane" class="bg-white text-green-600 font-bold py-2 px-4 rounded">
               Add to Display Pane
             </button>
-            <button @click="exportToCSV" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            <button @click="exportToCSV" class="bg-white text-green-600 font-bold py-2 px-4 rounded">
               Export as CSV
             </button>
           </div>
@@ -32,7 +32,7 @@
         <div class="flex border-b border-gray-200 mb-4">
           <button
             class="py-2 px-4 text-sm font-medium text-center border-b-2"
-            :class="{ 'border-blue-500 text-blue-600': activeTab === 'table', 'border-transparent hover:border-gray-300': activeTab !== 'table' }"
+            :class="{ 'border-white text-white': activeTab === 'table', 'border-transparent hover:border-gray-300': activeTab !== 'table' }"
             @click="switchTab('table')"
           >
             Table
@@ -41,7 +41,7 @@
             v-for="viz in visualizations"
             :key="viz.id"
             class="py-2 px-4 text-sm font-medium text-center border-b-2"
-            :class="{ 'border-blue-500 text-blue-600': activeTab === viz.id, 'border-transparent hover:border-gray-300': activeTab !== viz.id }"
+            :class="{ 'border-white text-white': activeTab === viz.id, 'border-transparent hover:border-gray-300': activeTab !== viz.id }"
             @click="switchTab(viz.id)"
           >
             {{ viz.name }}
@@ -50,44 +50,44 @@
         <div v-if="activeTab === 'table'" class="overflow-x-auto">
           <div v-if="block.error" class="text-red-500 mb-4">{{ block.error }}</div>
           <table v-else-if="block.result && block.result.length > 0" class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gray-600 text-white">
               <tr>
-                <th v-for="header in tableHeaders" :key="header" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th v-for="header in tableHeaders" :key="header" class="px-6 py-3 text-left text-xs font-medium text-white text-bold uppercase tracking-wider">
                   {{ header }}
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="g-gray-800 text-whitedivide-y divide-gray-200">
               <tr v-for="(row, index) in paginatedData" :key="index">
-                <td v-for="header in tableHeaders" :key="header" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td v-for="header in tableHeaders" :key="header" class="px-6 py-4 whitespace-nowrap text-sm text-white">
                   {{ row[header] }}
                 </td>
               </tr>
             </tbody>
           </table>
           <div v-if="block.result && block.result.length > 0" class="flex justify-center items-center mt-4">
-            <button @click="prevPage" :disabled="currentPage === 1" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2 disabled:opacity-50">
+            <button @click="prevPage" :disabled="currentPage === 1" class="bg-white text-green-600 font-bold py-2 px-4 rounded mr-2 disabled:opacity-50">
               Previous
             </button>
             <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button @click="nextPage" :disabled="currentPage === totalPages" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded ml-2 disabled:opacity-50">
+            <button @click="nextPage" :disabled="currentPage === totalPages" class="bg-white text-green-600 font-bold py-2 px-4 rounded ml-2 disabled:opacity-50">
               Next
             </button>
           </div>
         </div>
         <div v-for="viz in visualizations" :key="viz.id" v-show="activeTab === viz.id">
           <div class="flex space-x-4 mb-4">
-            <input v-model="viz.name" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1" />
-            <select v-model="viz.chartType" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1">
+            <input v-model="viz.name" @change="updateVisualization(viz)" class="border border-gray-300 text-black rounded px-2 py-1" />
+            <select v-model="viz.chartType" @change="updateVisualization(viz)" class="border border-gray-300 text-black rounded px-2 py-1">
               <option value="bar">Bar Chart</option>
               <option value="line">Line Chart</option>
               <option value="pie">Pie Chart</option>
               <option value="scatter">Scatter Plot</option>
             </select>
-            <select v-model="viz.xAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1">
+            <select v-model="viz.xAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1 text-black">
               <option v-for="column in tableHeaders" :key="column" :value="column">{{ column }}</option>
             </select>
-            <select v-model="viz.yAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1">
+            <select v-model="viz.yAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1 text-black">
               <option v-for="column in tableHeaders" :key="column" :value="column">{{ column }}</option>
             </select>
           </div>
@@ -165,12 +165,16 @@
     if (block.value?.result) {
       const displayItem = {
         id: `display-${Date.now()}`,
-        type: 'query-result',
+        type: 'visualization',
         name: `Query Result ${props.blockId}`,
         data: block.value.result,
         query: query.value,
-        headers: tableHeaders.value
+        headers: tableHeaders.value,
+        xAxis: tableHeaders.value[0],
+        yAxis: tableHeaders.value[1],
+        chartType: 'bar'
       }
+      console.log("display item", displayItem)
       displayPaneStore.addItem(displayItem)
     }
   }
@@ -182,11 +186,15 @@
       name: `Visualization ${visualizations.value.length + 1}`,
       chartType: 'bar',
       xAxis: tableHeaders.value[0],
-      yAxis: tableHeaders.value[1]
+      yAxis: tableHeaders.value[1],
+      type: 'visualization',
     }
+    
     visualizations.value.push(newViz)
     activeTab.value = vizId
     updateVisualization(newViz)
+    console.log(newViz)
+    // displayPaneStore.addItem(newViz)
   }
   
   function updateVisualization(viz) {

@@ -16,7 +16,9 @@
             <p v-if="isEmpty" class="text-gray-400 text-center">Add visualizations here</p>
             <div v-for="item in displayItems" :key="item.id" class="mb-4">
               <h3 class="text-lg font-semibold mb-2">{{ item.name }}</h3>
-              <div :id="`${item.id}-container`" class="bg-gray-700 p-4 rounded-lg"></div>
+              <div :id="`${item.id}-container`" class="bg-gray-700 p-4 rounded-lg">
+                <!-- {{createVisualization(item.data, item.chartType, item.xAxis, item.yAxis)}} -->
+              </div>
             </div>
           </div>
           <button 
@@ -31,15 +33,26 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted, watch } from 'vue'
+  import { ref, computed, onMounted, watch, nextTick } from 'vue'
   import { useDisplayPaneStore } from '@/stores/displayPaneStore'
   import { createVisualization } from "@/utils/visualization"
+  // import html2pdf from "html2pdf.js";
   
   const displayPaneStore = useDisplayPaneStore()
   const isCollapsed = ref(false)
   const displayArea = ref(null)
   
+  // const plainResultItems = displayPaneStore.items.toArray().map(row => {
+  //       const plainRow = {}
+  //       for (const key in row){
+  //         plainRow[key] = row[key]
+  //       }
+  //       return plainRow
+  //     })
+  //     console.log(plainResult)
   const displayItems = computed(() => displayPaneStore.items)
+  console.log("here", displayItems.value)
+  console.log("display items length", displayItems.value.length)
   const isEmpty = computed(() => displayItems.value.length === 0)
   
   function toggleCollapse() {
@@ -49,20 +62,20 @@
   function exportToPdf() {
     console.log('Exporting to PDF...')
     alert('PDF export functionality to be implemented')
+    html2pdf(document.getElementById("displayArea"))
   }
-  
-  watch(displayItems, () => {
-    nextTick(() => {
+  nextTick(() => {
       displayItems.value.forEach(item => {
         if (item.type === 'visualization') {
           const container = document.getElementById(`${item.id}-container`)
           if (container) {
+            console.log("container", item)
             createVisualization(container, item.data, item.chartType, item.xAxis, item.yAxis)
           }
         }
       })
-    })
-  }, { deep: true })
+  })  
+  watch(displayItems, nextTick, { deep: true })
   
   onMounted(() => {
     // Initial render of visualizations
