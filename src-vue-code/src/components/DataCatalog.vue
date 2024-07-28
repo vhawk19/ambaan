@@ -8,22 +8,23 @@
             id="file-upload"
             type="file"
             ref="fileInput"
+            v-bind="fileInput"
             accept=".csv,.parquet"
-            @change="handleFileChange"
+            v-on:change="importFile"
             class="block w-full text-sm text-gray-500
                    file:mr-4 file:py-2 file:px-4
-                   file:rounded-full file:border-0
+                   file:border-0
                    file:text-sm file:font-semibold
-                   file:bg-blue-50 file:text-blue-700
-                   hover:file:bg-blue-100"
+                   file:bg-blue-50 file:text-green-700
+                   hover:file:bg-green-100"
           />
         </label>
-        <button
+        <!-- <button
           @click="importFile"
           class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
           Import File
-        </button>
+        </button> -->
       </div>
       <div id="fileList">
         <h3 class="text-xl font-semibold mb-2">Imported Files:</h3>
@@ -31,9 +32,19 @@
         <ul v-else class="space-y-4">
           <li v-for="file in fileStore.importedFiles" :key="file.tableName" class="bg-gray-700 p-4 rounded shadow">
             <div class="table-item">
-              <h3 @click="toggleOptions(file.tableName)" class="text-lg font-semibold cursor-pointer hover:text-blue-300">
+              <!-- <h3 @click="toggleOptions(file.tableName)" class="text-lg font-semibold cursor-pointer hover:text-blue-300">
                 {{ file.tableName }}
-              </h3>
+              </h3> -->
+
+              <input
+                  v-model="file.newName"
+                  type="text"
+                  class="mr-2 p-1 rounded font-semibold cursor-pointer bg-gray-700 hover:border-white text-white "
+                  v-bind="file.newName"
+                  v-on:change="renameTable(file.tableName)"
+                  :placeholder="file.tableName"
+                  v-on:click="toggleOptions(file.tableName)"
+              />
               <p class="text-sm text-gray-400">Original file: {{ file.fileName }}</p>
               <div v-if="file.showOptions" class="table-actions mt-2 space-y-2">
                 <button
@@ -42,15 +53,15 @@
                 >
                   {{ file.showSchema ? 'Hide' : 'Show' }} Schema
                 </button>
-                <button
+                <!-- <button
                   @click="showRenameForm(file.tableName)"
-                  class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-sm"
+                  class="w-full bg-white hover:bg-white text-green-500 font-bold py-1 px-2 rounded text-sm"
                 >
                   Rename Table
-                </button>
+                </button> -->
               </div>
               <div v-if="file.showSchema" class="schema-display mt-2">
-                <table v-if="file.schemaData.length > 0" class="w-full text-sm">
+                <table v-if="schemaInfo" class="w-full text-sm">
                   <thead>
                     <tr>
                       <th class="text-left">Column Name</th>
@@ -66,20 +77,22 @@
                 </table>
                 <p v-else-if="file.schemaError" class="text-red-500">{{ file.schemaError }}</p>
               </div>
-              <div v-if="file.showRenameForm" class="rename-form mt-2">
-                <input
+              <!-- <div v-if="file.showRenameForm" class="rename-form mt-2"> -->
+                <!-- <input
                   v-model="file.newName"
                   type="text"
                   :placeholder="'New name for ' + file.tableName"
                   class="mr-2 p-1 rounded"
-                >
-                <button
+                  v-bind="file.newName"
+                  v-on:change="renameTable(file.tableName)"
+                > -->
+                <!-- <button
                   @click="renameTable(file.tableName)"
-                  class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-sm"
+                  class="bg-green-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-sm"
                 >
                   Rename
-                </button>
-              </div>
+                </button> -->
+              <!-- </div> -->
             </div>
           </li>
         </ul>
@@ -101,19 +114,21 @@
         fileStore,
         tableStore,
         db,
-        conn
+        conn,
       }
     },
     data() {
       return {
-        selectedFile: null
+        selectedFile: null,
+        schemaInfo: []
       }
     },
     methods: {
-      handleFileChange(event) {
+      // handleFileChange(event) {
+      //   this.selectedFile = event.target.files[0];
+      // },
+      async importFile(event) {
         this.selectedFile = event.target.files[0];
-      },
-      async importFile() {
         if (!this.selectedFile) {
           alert("Please select a file to import.");
           return;
@@ -134,8 +149,12 @@
     if (file.showSchema) {
       try {
         const schemaData = await this.tableStore.showSchema(tableName);
+        // this.schemaInfo = schemaData
         file.schemaData = schemaData;
         file.schemaError = '';
+        console.log("schema")
+        // console.log(this.schemaInfo)
+        // this.schemaInfo.forEach((row => console.log(row)))
       } catch (error) {
         console.error('Error fetching schema:', error);
         file.schemaError = 'Error fetching schema';
@@ -177,3 +196,9 @@
     }
   }
   </script>
+
+<style>
+*::placeholder{
+  color: white !important;
+}
+</style>
