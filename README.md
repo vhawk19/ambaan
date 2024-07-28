@@ -2,6 +2,10 @@
 # Ambaan
 *just wants the average analyst to be happi*
 
+### FOSS HACK Specific Details
+- Demo viedo: https://www.loom.com/share/70bae857cbc440dd8686e8cac92ba942?sid=0e871947-5329-4e0c-a27a-41cedc5497f1
+- Last commit hash for the hackathon: https://github.com/vhawk19/ambaan/commit/45f2a87cc3e7c8781a502dec6f95ad7dc8e907c9
+
 ## Contents
 - [Project Overview](#project-overview)
 - [How to Clone and Run](#how-to-clone-and-run)
