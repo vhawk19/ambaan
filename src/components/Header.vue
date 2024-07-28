@@ -1,5 +1,5 @@
 <template>
-    <header class="header p-5 m-0 bg-gray-900 flex">
+    <header class="header p-5 m-0 bg-gray-900 flex items-center">
         <Logo />
         <div>
             <h1 class="text-2xl ambaan-text text-white">Ambaan</h1>

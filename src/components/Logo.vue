@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img src="../../landing/ambaan.png" class="w-10 h-10 rounded-full mx-2">
+        <img src="../../landing/ambaan.png" class="w-12 h-12 mx-2">
     </div>
 </template>
 
