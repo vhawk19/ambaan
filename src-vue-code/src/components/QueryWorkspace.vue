@@ -1,0 +1,26 @@
+<template>
+    <div class="query-workspace flex h-screen">
+      <div class="flex-grow overflow-y-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Query Workspace</h1>
+        <button @click="addQueryBlock" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4">
+          Add Query Block
+        </button>
+        <div v-for="block in queryBlocks" :key="block.id" class="mb-4">
+          <QueryBlock :blockId="block.id" />
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <script setup>
+  import { onMounted } from 'vue'
+  import QueryBlock from '@/components/QueryBlock.vue'
+  import { useQueryBlockStore } from '@/stores/queryBlockStore'
+  
+  const queryBlockStore = useQueryBlockStore()
+  const { queryBlocks, addQueryBlock } = queryBlockStore
+  
+  onMounted(() => {
+    addQueryBlock()
+  })
+  </script>
