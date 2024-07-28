@@ -76,23 +76,23 @@
           </div>
         </div>
         <div v-for="viz in visualizations" :key="viz.id" v-show="activeTab === viz.id">
-          <div class="flex space-x-4 mb-4">
-            <input v-model="viz.name" @change="updateVisualization(viz)" class="border border-gray-300 text-black rounded px-2 py-1" />
-            <select v-model="viz.chartType" @change="updateVisualization(viz)" class="border border-gray-300 text-black rounded px-2 py-1">
-              <option value="bar">Bar Chart</option>
-              <option value="line">Line Chart</option>
-              <option value="pie">Pie Chart</option>
-              <option value="scatter">Scatter Plot</option>
-            </select>
-            <select v-model="viz.xAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1 text-black">
-              <option v-for="column in tableHeaders" :key="column" :value="column">{{ column }}</option>
-            </select>
-            <select v-model="viz.yAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1 text-black">
-              <option v-for="column in tableHeaders" :key="column" :value="column">{{ column }}</option>
-            </select>
-          </div>
-          <div :id="`${viz.id}-chart-container`" class="w-full h-96 border border-gray-300 rounded"></div>
-        </div>
+    <div class="flex space-x-4 mb-4">
+      <input v-model="viz.name" @change="updateVisualization(viz)" class="border border-gray-300 text-black rounded px-2 py-1" />
+      <select v-model="viz.chartType" @change="updateVisualization(viz)" class="border border-gray-300 text-black rounded px-2 py-1">
+        <option value="bar">Bar Chart</option>
+        <option value="line">Line Chart</option>
+        <option value="pie">Pie Chart</option>
+        <option value="scatter">Scatter Plot</option>
+      </select>
+      <select v-model="viz.xAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1 text-black">
+        <option v-for="column in tableHeaders" :key="column" :value="column">{{ column }}</option>
+      </select>
+      <select v-model="viz.yAxis" @change="updateVisualization(viz)" class="border border-gray-300 rounded px-2 py-1 text-black">
+        <option v-for="column in tableHeaders" :key="column" :value="column">{{ column }}</option>
+      </select>
+    </div>
+    <div :id="`${viz.id}-chart-container`" class="w-full h-96 border border-gray-300 rounded"></div>
+  </div>
       </div>
     </div>
   </template>
@@ -161,52 +161,102 @@
     currentPage.value = 1
   }
   
-  function addToDisplayPane() {
-    if (block.value?.result) {
-      const displayItem = {
-        id: `display-${Date.now()}`,
-        type: 'visualization',
-        name: `Query Result ${props.blockId}`,
-        data: block.value.result,
-        query: query.value,
-        headers: tableHeaders.value,
-        xAxis: tableHeaders.value[0],
-        yAxis: tableHeaders.value[1],
-        chartType: 'bar'
+
+  function updateVisualization(viz) {
+  if (viz && block.value?.result) {
+    nextTick(() => {
+      const container = document.getElementById(`${viz.id}-chart-container`)
+      if (container) {
+        createVisualization(container, block.value.result, viz.chartType, viz.xAxis, viz.yAxis)
       }
-      console.log("display item", displayItem)
-      displayPaneStore.addItem(displayItem)
-    }
+      
+      // Update the corresponding visualization in the Display Pane
+      const displayItem = displayPaneStore.getItemByQueryBlockId(props.blockId, viz.id)
+      if (displayItem) {
+        displayPaneStore.updateItem({
+          ...displayItem,
+          name: viz.name,
+          chartType: viz.chartType,
+          xAxis: viz.xAxis,
+          yAxis: viz.yAxis,
+          data: block.value.result
+        })
+      }
+    })
   }
-  
-  function addVisualization() {
-    const vizId = `visualization-${Date.now()}`
-    const newViz = {
-      id: vizId,
-      name: `Visualization ${visualizations.value.length + 1}`,
+}
+
+function addToDisplayPane() {
+  if (block.value?.result) {
+    // Use the last created visualization or a default if none exists
+    const lastViz = visualizations.value[visualizations.value.length - 1] || {
       chartType: 'bar',
       xAxis: tableHeaders.value[0],
       yAxis: tableHeaders.value[1],
-      type: 'visualization',
+      name: `Query Result ${props.blockId}`
     }
-    
-    visualizations.value.push(newViz)
-    activeTab.value = vizId
-    updateVisualization(newViz)
-    console.log(newViz)
-    // displayPaneStore.addItem(newViz)
+
+    const displayItem = {
+      id: `display-${Date.now()}`,
+      queryBlockId: props.blockId,
+      vizId: lastViz.id,
+      type: 'visualization',
+      name: lastViz.name,
+      data: block.value.result,
+      query: query.value,
+      chartType: lastViz.chartType,
+      xAxis: lastViz.xAxis,
+      yAxis: lastViz.yAxis,
+    }
+    console.log("Adding display item:", displayItem)
+    displayPaneStore.addItem(displayItem)
+  }
+}
+
+function addVisualization() {
+  const vizId = `visualization-${Date.now()}`
+  const newViz = {
+    id: vizId,
+    name: `Visualization ${visualizations.value.length + 1}`,
+    chartType: 'bar',
+    xAxis: tableHeaders.value[0],
+    yAxis: tableHeaders.value[1],
   }
   
-  function updateVisualization(viz) {
-    if (viz && block.value?.result) {
-      nextTick(() => {
-        const container = document.getElementById(`${viz.id}-chart-container`)
-        if (container) {
-          createVisualization(container, block.value.result, viz.chartType, viz.xAxis, viz.yAxis)
-        }
-      })
-    }
-  }
+  visualizations.value.push(newViz)
+  activeTab.value = vizId
+  updateVisualization(newViz)
+}
+
+
+  // function addVisualization() {
+  //   const vizId = `visualization-${Date.now()}`
+  //   const newViz = {
+  //     id: vizId,
+  //     name: `Visualization ${visualizations.value.length + 1}`,
+  //     chartType: 'bar',
+  //     xAxis: tableHeaders.value[0],
+  //     yAxis: tableHeaders.value[1],
+  //     type: 'visualization',
+  //   }
+    
+  //   visualizations.value.push(newViz)
+  //   activeTab.value = vizId
+  //   updateVisualization(newViz)
+  //   console.log(newViz)
+  //   // displayPaneStore.addItem(newViz)
+  // }
+  
+  // function updateVisualization(viz) {
+  //   if (viz && block.value?.result) {
+  //     nextTick(() => {
+  //       const container = document.getElementById(`${viz.id}-chart-container`)
+  //       if (container) {
+  //         createVisualization(container, block.value.result, viz.chartType, viz.xAxis, viz.yAxis)
+  //       }
+  //     })
+  //   }
+  // }
   
   function exportToCSV() {
     if (block.value?.result) {
