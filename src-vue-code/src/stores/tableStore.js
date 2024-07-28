@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { db } from '../duck'
+import { conn } from '../duck'
 
 export const useTableStore = defineStore('table', () => {
   async function showSchema(tableName) {
     try {
-      const result = await db.query(`DESCRIBE ${tableName}`)
+      const result = await conn.query(`DESCRIBE ${tableName}`)
       return result.toArray()
     } catch (error) {
       console.error('Error fetching schema:', error)
@@ -14,7 +14,7 @@ export const useTableStore = defineStore('table', () => {
 
   async function renameTable(oldTableName, newTableName) {
     try {
-      await db.query(`ALTER TABLE ${oldTableName} RENAME TO ${newTableName}`)
+      await conn.query(`ALTER TABLE ${oldTableName} RENAME TO ${newTableName}`)
       return `Table renamed from ${oldTableName} to ${newTableName}`
     } catch (error) {
       console.error('Error renaming table:', error)

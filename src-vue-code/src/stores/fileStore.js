@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import * as duckdb from '@duckdb/duckdb-wasm'
-import { db } from '../duck'
+import { db, conn } from '../duck'
 
 export const useFileStore = defineStore('file', () => {
   const importedFiles = ref([])
@@ -19,7 +19,7 @@ export const useFileStore = defineStore('file', () => {
           duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
           true
         )
-        await db.query(
+        await conn.query(
           `CREATE TABLE ${tableName} AS SELECT * FROM read_csv_auto('${fileName}')`
         )
       } else if (fileExtension === 'parquet') {
@@ -29,7 +29,7 @@ export const useFileStore = defineStore('file', () => {
           duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
           true
         )
-        await db.query(
+        await conn.query(
           `CREATE TABLE ${tableName} AS SELECT * FROM read_parquet('${fileName}')`
         )
       } else {

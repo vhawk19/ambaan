@@ -4,12 +4,12 @@
       <div class="mb-4 space-y-2">
         <label for="file-upload" class="block">
           <span class="sr-only">Choose file</span>
-          <input 
+          <input
             id="file-upload"
-            type="file" 
-            ref="fileInput" 
-            accept=".csv,.parquet" 
-            @change="handleFileChange" 
+            type="file"
+            ref="fileInput"
+            accept=".csv,.parquet"
+            @change="handleFileChange"
             class="block w-full text-sm text-gray-500
                    file:mr-4 file:py-2 file:px-4
                    file:rounded-full file:border-0
@@ -18,8 +18,8 @@
                    hover:file:bg-blue-100"
           />
         </label>
-        <button 
-          @click="importFile" 
+        <button
+          @click="importFile"
           class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
           Import File
@@ -27,27 +27,59 @@
       </div>
       <div id="fileList">
         <h3 class="text-xl font-semibold mb-2">Imported Files:</h3>
-        <p v-if="importedFiles.length === 0" class="text-gray-400">No files imported yet.</p>
+        <p v-if="fileStore.importedFiles.length === 0" class="text-gray-400">No files imported yet.</p>
         <ul v-else class="space-y-4">
-          <li v-for="file in importedFiles" :key="file.tableName" class="bg-gray-700 p-4 rounded shadow">
+          <li v-for="file in fileStore.importedFiles" :key="file.tableName" class="bg-gray-700 p-4 rounded shadow">
             <div class="table-item">
-              <h3 class="text-lg font-semibold">{{ file.tableName }}</h3>
+              <h3 @click="toggleOptions(file.tableName)" class="text-lg font-semibold cursor-pointer hover:text-blue-300">
+                {{ file.tableName }}
+              </h3>
               <p class="text-sm text-gray-400">Original file: {{ file.fileName }}</p>
-              <div class="table-actions mt-2 space-x-2">
-                <button 
+              <div v-if="file.showOptions" class="table-actions mt-2 space-y-2">
+                <button
                   @click="showSchema(file.tableName)"
-                  class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded text-sm"
+                  class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded text-sm"
                 >
                   {{ file.showSchema ? 'Hide' : 'Show' }} Schema
                 </button>
-                <button 
+                <button
                   @click="showRenameForm(file.tableName)"
-                  class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-sm"
+                  class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-sm"
                 >
                   Rename Table
                 </button>
               </div>
-              <!-- Schema display and rename form code remains the same -->
+              <div v-if="file.showSchema" class="schema-display mt-2">
+                <table v-if="file.schemaData.length > 0" class="w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th class="text-left">Column Name</th>
+                      <th class="text-left">Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="row in file.schemaData" :key="row.column_name">
+                      <td>{{ row.column_name }}</td>
+                      <td>{{ row.column_type }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p v-else-if="file.schemaError" class="text-red-500">{{ file.schemaError }}</p>
+              </div>
+              <div v-if="file.showRenameForm" class="rename-form mt-2">
+                <input
+                  v-model="file.newName"
+                  type="text"
+                  :placeholder="'New name for ' + file.tableName"
+                  class="mr-2 p-1 rounded"
+                >
+                <button
+                  @click="renameTable(file.tableName)"
+                  class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-sm"
+                >
+                  Rename
+                </button>
+              </div>
             </div>
           </li>
         </ul>
@@ -56,16 +88,24 @@
   </template>
   
   <script>
-  import * as duckdb from '@duckdb/duckdb-wasm'
-  import { conn, db } from '../duck'
+  import { useFileStore } from '@/stores/fileStore'
+  import { useTableStore } from '@/stores/tableStore'
+  import { db, conn } from '@/duck'
   
   export default {
     name: 'DataCatalog',
+    setup() {
+      const fileStore = useFileStore()
+      const tableStore = useTableStore()
+      return {
+        fileStore,
+        tableStore,
+        db,
+        conn
+      }
+    },
     data() {
       return {
-        importedFiles: [],
-        conn,
-        db,
         selectedFile: null
       }
     },
@@ -78,75 +118,60 @@
           alert("Please select a file to import.");
           return;
         }
-        const fileName = this.selectedFile.name;
-        const fileExtension = fileName.split(".").pop().toLowerCase();
-        const tableName = fileName.split(".")[0].replace(/\W/g, "_");
         try {
-          if (fileExtension === "csv") {
-            await this.db.registerFileHandle(fileName, this.selectedFile, duckdb.DuckDBDataProtocol.BROWSER_FILEREADER, true);
-            await this.conn.query(`CREATE TABLE ${tableName} AS SELECT * FROM read_csv_auto('${fileName}');`);
-          } else if (fileExtension === "parquet") {
-            await this.db.registerFileHandle(fileName, this.selectedFile, duckdb.DuckDBDataProtocol.BROWSER_FILEREADER, true);
-            await this.conn.query(`CREATE TABLE ${tableName} AS SELECT * FROM read_parquet('${fileName}');`);
-          } else {
-            throw new Error("Unsupported file format. Please use CSV or Parquet files.");
-          }
-          this.importedFiles.push({ 
-            fileName, 
-            tableName, 
-            showSchema: false, 
-            schemaData: [], 
-            schemaError: '',
-            showRenameForm: false,
-            newName: ''
-          });
-          alert(`File "${fileName}" imported successfully as table "${tableName}".`);
+          await this.fileStore.importFile(this.selectedFile, this.db, this.conn);
+          alert(`File "${this.selectedFile.name}" imported successfully.`);
         } catch (error) {
           alert(`Error importing file: ${error.message}`);
         }
-        this.$refs.fileInput.value = ''; // Reset file input
+        this.$refs.fileInput.value = '';
         this.selectedFile = null;
       },
       async showSchema(tableName) {
-        const file = this.importedFiles.find(f => f.tableName === tableName);
-        if (file) {
-          file.showSchema = !file.showSchema;
-          if (file.showSchema && file.schemaData.length === 0) {
-            try {
-              const result = await this.conn.query(`DESCRIBE ${tableName};`);
-              file.schemaData = result.toArray();
-              file.schemaError = '';
-            } catch (error) {
-              console.error('Error fetching schema:', error);
-              file.schemaError = 'Error fetching schema';
-            }
-          }
-        }
-      },
+  const file = this.fileStore.importedFiles.find(f => f.tableName === tableName);
+  if (file) {
+    file.showSchema = !file.showSchema;
+    if (file.showSchema) {
+      try {
+        const schemaData = await this.tableStore.showSchema(tableName);
+        file.schemaData = schemaData;
+        file.schemaError = '';
+      } catch (error) {
+        console.error('Error fetching schema:', error);
+        file.schemaError = 'Error fetching schema';
+        file.schemaData = [];
+      }
+    }
+  }
+},
       showRenameForm(tableName) {
-        const file = this.importedFiles.find(f => f.tableName === tableName);
+        const file = this.fileStore.importedFiles.find(f => f.tableName === tableName);
         if (file) {
           file.showRenameForm = !file.showRenameForm;
         }
       },
       async renameTable(oldTableName) {
-        const file = this.importedFiles.find(f => f.tableName === oldTableName);
+        const file = this.fileStore.importedFiles.find(f => f.tableName === oldTableName);
         if (!file) return;
-  
         const newTableName = file.newName.trim();
         if (newTableName && newTableName !== oldTableName) {
           try {
-            await this.conn.query(`ALTER TABLE ${oldTableName} RENAME TO ${newTableName};`);
+            const result = await this.tableStore.renameTable(oldTableName, newTableName);
             file.tableName = newTableName;
             file.showRenameForm = false;
             file.newName = '';
-            alert(`Table renamed from ${oldTableName} to ${newTableName}`);
+            alert(result);
           } catch (error) {
-            console.error('Error renaming table:', error);
             alert(`Error renaming table: ${error.message}`);
           }
         } else {
           alert('Please enter a valid new table name');
+        }
+      },
+      toggleOptions(tableName) {
+        const file = this.fileStore.importedFiles.find(f => f.tableName === tableName);
+        if (file) {
+          file.showOptions = !file.showOptions;
         }
       }
     }
