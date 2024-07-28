@@ -1,124 +1,94 @@
 <template>
-    <!-- <NuxtRouteAnnouncer /> -->
-    <div class="container">
-            <DataCatalog />
+    <div class="app-container">
+      <div class="flex h-screen w-full overflow-hidden bg-gray-900 text-white">
+        <!-- Data Catalog -->
+        <div 
+          :class="['transition-all duration-300 ease-in-out', 
+                   isDataCatalogVisible ? 'w-1/4' : 'w-0']"
+        >
+          <DataCatalog v-if="isDataCatalogVisible" />
+        </div>
+        
+        <!-- Main content area -->
+        <div class="flex flex-grow overflow-hidden">
+          <!-- Toggle button for Data Catalog -->
+          <div 
+            @click="toggleDataCatalog" 
+            :class="['cursor-pointer flex items-center justify-center w-6 bg-green-500 hover:bg-green-600 transition-colors',
+                     isDataCatalogVisible ? 'rotate-0' : 'rotate-180']"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+          
+          <!-- Query Workspace -->
+          <div class="flex-grow overflow-auto">
             <QueryWorkspace />
-            <DisplayPane/>
+          </div>
+          
+          <!-- Toggle button for Display Pane -->
+          <div 
+            @click="toggleDisplayPane" 
+            :class="['cursor-pointer flex items-center justify-center w-6 bg-green-500 hover:bg-green-600 transition-colors',
+                     isDisplayPaneVisible ? 'rotate-180' : 'rotate-0']"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+          
+          <!-- Display Pane -->
+          <div 
+            :class="['transition-all duration-300 ease-in-out', 
+                     isDisplayPaneVisible ? 'w-1/4' : 'w-0']"
+          >
+            <DisplayPane v-if="isDisplayPaneVisible" />
+          </div>
+        </div>
+      </div>
     </div>
-</template>
-<style>
-    body,
-    html,
-    #app {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        line-height: 1.6;
-        max-width: 100%;
-    }
-    .container {
-        display: flex;
-        height: 100%;
-        width: 100vw;
-    }
-    .data-catalog {
-        max-width: 30%;
-        background-color: #f0f0f0;
-        padding: 20px;
-        overflow-y: auto;
-    }
-    .query-workspace {
-        width: 60%;
-        padding: 20px;
-        overflow-y: auto;
-    }
-    h2 {
-        margin-top: 0;
-    }
-    input[type="file"],
-    input[type="text"],
-    textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        margin-top: 40px;
-    }
-    button {
-        padding: 10px 20px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        margin-right: 10px;
-        margin-bottom: 10px;
-    }
-    button:hover {
-        background-color: #45a049;
-    }
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    th,
-    td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f2f2f2;
-        position: sticky;
-        top: 0;
-    }
-    .code-block {
-        background-color: #f8f8f8;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 10px;
-        margin-bottom: 20px;
-        margin-top: 20px;
-    }
-    .output-block {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 10px;
-        margin-top: 10px;
-        max-height: 300px;
-        overflow-y: auto;
-        color: black;
-        /* display: none; */
-    }
-    .add-query-btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        font-size: 24px;
-        background-color: #f0f0f0;
-        border: 2px dashed #ccc;
-        color: #666;
-        padding: 10px;
-        cursor: pointer;
-        margin-top: 50px;
-    }
-    .add-query-btn:hover {
-        background-color: #e0e0e0;
-    }
-    ul {
-        color: black;
-    }
-</style>
-<script>
-import QueryBlock from './components/QueryBlock.vue';
-import DataCatalog from './components/DataCatalog.vue';
-import DisplayPane from './components/DisplayPane.vue';
-import QueryWorkspace from './components/QueryWorkspace.vue';
-export default {
-    methods: {},
-    async beforeCreate() {
-        console.log("Started here")
+  </template>
+  
+  <script>
+  import DataCatalog from './components/DataCatalog.vue';
+  import QueryWorkspace from './components/QueryWorkspace.vue';
+  import DisplayPane from './components/DisplayPane.vue';
+  
+  export default {
+    components: {
+      DataCatalog,
+      QueryWorkspace,
+      DisplayPane,
     },
-    components: { QueryBlock, DataCatalog, DisplayPane, QueryWorkspace },
-}
-</script>
+    data() {
+      return {
+        isDataCatalogVisible: true,
+        isDisplayPaneVisible: true,
+      };
+    },
+    methods: {
+      toggleDataCatalog() {
+        this.isDataCatalogVisible = !this.isDataCatalogVisible;
+      },
+      toggleDisplayPane() {
+        this.isDisplayPaneVisible = !this.isDisplayPaneVisible;
+      },
+    },
+  };
+  </script>
+  
+  <style>
+  /* Global styles to ensure full-width layout */
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .app-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  </style>
