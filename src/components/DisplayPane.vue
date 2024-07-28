@@ -36,6 +36,7 @@
   import { ref, computed, onMounted, watch, nextTick } from 'vue'
   import { useDisplayPaneStore } from '@/stores/displayPaneStore'
   import { createVisualization } from "@/utils/visualization"
+  // import html2pdf from "html2pdf.js";
   
   const displayPaneStore = useDisplayPaneStore()
   const isCollapsed = ref(false)
@@ -61,6 +62,7 @@
   function exportToPdf() {
     console.log('Exporting to PDF...')
     alert('PDF export functionality to be implemented')
+    html2pdf(document.getElementById("displayArea"))
   }
   nextTick(() => {
       displayItems.value.forEach(item => {
