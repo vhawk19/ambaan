@@ -8,6 +8,8 @@
 - [What It Achieves](#what-it-achieves)
 - [Why This Project](#why-this-project)
 - [Features](#features)
+- [What is completed within the hackathon - FossHack 2024](#what-is-completed-within-the-hackathon---fosshack-2024)
+- [What is not completed](#what-is-not-completed)
 - [License](#license)
 - [Contributions](#contributions)
 
@@ -44,6 +46,18 @@ Data analysis can get messy really quickly. Ambaan is a simple tool that allows 
 - Create simple visualisations
 - Export the visualisations as pdf
 - Export the data as csv
+## What is completed within the hackathon - FossHack 2024
+- Import csv/parquet files and remote
+- Check schema/rename tables
+- Run sql queries, and view results
+- Download it as csv
+- Create simple visualisations
+- Export the visualisations as pdf
+## What is not completed
+- Import sqlite, duckdb, arrow and other formats locally
+- Complex visualisation logic
+- Enriched sql editting experience with syntax highlighting, format
+- Markdown support in the display pane
 ## License
 - The project is licensed under GPL-3.0. You can use it for free, modify it, and distribute it as long as you keep the license intact.
 ## Contributions
