@@ -2,18 +2,22 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useDisplayPaneStore = defineStore('displayPane', () => {
-  const visualizations = ref([])
+  const items = ref([])
 
-  function addVisualization(visualization) {
-    visualizations.value.push(visualization)
+  function addItem(item) {
+    items.value.push(item)
   }
 
-  function removeVisualization(id) {
-    const index = visualizations.value.findIndex(v => v.id === id)
+  function removeItem(id) {
+    const index = items.value.findIndex((item) => item.id === id)
     if (index !== -1) {
-      visualizations.value.splice(index, 1)
+      items.value.splice(index, 1)
     }
   }
 
-  return { visualizations, addVisualization, removeVisualization }
+  function clearItems() {
+    items.value = []
+  }
+
+  return { items, addItem, removeItem, clearItems }
 })

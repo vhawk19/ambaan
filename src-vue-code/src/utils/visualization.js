@@ -2,9 +2,8 @@
 import Chart from 'chart.js/auto'
 
 export function createVisualization(container, data, chartType, xAxis, yAxis) {
-  if (container.chart) {
-    container.chart.destroy()
-  }
+  // Clear the container first
+  container.innerHTML = ''
 
   if (chartType === 'counter') {
     createCounter(container, data, yAxis)
@@ -12,10 +11,10 @@ export function createVisualization(container, data, chartType, xAxis, yAxis) {
     createChart(container, data, chartType, xAxis, yAxis)
   }
 }
+
 function createCounter(container, data, yAxis) {
-  container.innerHTML = ''
   const counterDiv = document.createElement('div')
-  counterDiv.className = 'counter'
+  counterDiv.className = 'text-4xl font-bold text-center'
   const value = data.reduce(
     (sum, item) => sum + parseFloat(item[yAxis] || 0),
     0
@@ -23,10 +22,10 @@ function createCounter(container, data, yAxis) {
   counterDiv.textContent = value.toLocaleString()
   container.appendChild(counterDiv)
 }
+
 function createChart(container, data, chartType, xAxis, yAxis) {
-  const ctx = document.createElement('canvas')
-  container.innerHTML = ''
-  container.appendChild(ctx)
+  const canvas = document.createElement('canvas')
+  container.appendChild(canvas)
 
   const xValues = data.map((item) => item[xAxis])
   const yValues = data.map((item) => parseFloat(item[yAxis]))
@@ -89,5 +88,5 @@ function createChart(container, data, chartType, xAxis, yAxis) {
     chartConfig.data.labels = null
   }
 
-  container.chart = new Chart(ctx, chartConfig)
+  new Chart(canvas, chartConfig)
 }

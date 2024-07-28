@@ -1,45 +1,26 @@
 <template>
-    <div class="query-workspace p-4 bg-gray-900 h-full overflow-auto text-white">
-      <h2 class="text-2xl font-bold mb-4">Query Workspace</h2>
-      <div id="queryBlocks" class="space-y-4">
-        <QueryBlock 
-          v-for="blockId in queryBlockCounter" 
-          :key="blockId" 
-          :blockId="blockId" 
-        />
-      </div>
-      <div 
-        class="add-query-btn mt-4 bg-white text-green-600 font-bold py-2 px-4 rounded cursor-pointer text-center"
-        @click="addQueryBlock"
-      >
-        + Add Query Block
+    <div class="query-workspace flex h-screen">
+      <div class="flex-grow overflow-y-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Query Workspace</h1>
+        <button @click="addQueryBlock" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4">
+          Add Query Block
+        </button>
+        <div v-for="block in queryBlocks" :key="block.id" class="mb-4">
+          <QueryBlock :blockId="block.id" />
+        </div>
       </div>
     </div>
   </template>
   
-  <script>
-  import QueryBlock from './QueryBlock.vue';
+  <script setup>
+  import { onMounted } from 'vue'
+  import QueryBlock from '@/components/QueryBlock.vue'
+  import { useQueryBlockStore } from '@/stores/queryBlockStore'
   
-  export default {
-    name: 'QueryWorkspace',
-    components: {
-      QueryBlock
-    },
-    data() {
-      return {
-        queryBlockCounter: 1,
-      }
-    },
-    methods: {
-      addQueryBlock() {
-        this.queryBlockCounter++;
-      }
-    }
-  }
+  const queryBlockStore = useQueryBlockStore()
+  const { queryBlocks, addQueryBlock } = queryBlockStore
+  
+  onMounted(() => {
+    addQueryBlock()
+  })
   </script>
-
-<style>
-.add-query-btn {
-  max-width: 20%;
-}
-</style>
