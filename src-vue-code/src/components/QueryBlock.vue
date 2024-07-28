@@ -1,9 +1,9 @@
 <template>
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6 text-black">
+    <div class="bg-gray-900 rounded-lg shadow-md p-6 mb-6 text-white">
       <textarea
         v-model="query"
         rows="5"
-        class="w-full p-2 mb-4 border border-gray-300 rounded resize-vertical"
+        class="w-full p-2 mb-4 border border-gray-300 rounded bg-gray-800 text-white resize-vertical"
         placeholder="Enter your SQL query here"
       ></textarea>
       <div class="flex space-x-4 mb-4">
