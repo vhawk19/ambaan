@@ -10,7 +10,32 @@
         <h3>{{ fileListElement }}</h3>
         <ul class="ul">
             <li v-for="file in importedFiles" :key="file">
-                {{ file.fileName }} Table {{ file.tableName }}
+                <div class="table-item">
+                    <h3>{{ file.tableName }}</h3>
+                    <p> Original file: {{ file.fileName }} </p>
+                    <div class="table-actions">
+                        <button v-on:click="showSchema(file.tableName)">Show Schema</button>
+                        <button v-on:click="showRenameForm(file.tableName)">Rename Table</button>
+                    </div>
+                    <div :id="`schema-${file.tableName}`" class="schema-display" style="display: none;">
+                        <table class="schema-table">
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Type</th>
+                            </tr>
+                            <tr v-for="row in schemaData">
+                                <td>{{row.column_name}}</td>
+                                <td>{{row.column_type}}</td>
+                            </tr>
+                        </table>
+                        <p>{{ errorMsg }}</p>
+                    </div>
+                    <div :id="`rename-form-${file.tableName}`" class="rename-form" style="display: none;">
+                        <input type="text" :id="`new-name-${file.tableName}`" placeholder="New table name">
+                        <button v-on:click="renameTable(file.tableName)">Rename</button>
+                    </div>
+                </div>
+
             </li>
         </ul>
     </div>
@@ -29,7 +54,10 @@ export default {
             conn: conn,
             db: db,
             worker: worker,
-            fileListElement: ""
+            fileListElement: "",
+            schemaElement: null,
+            schemaData: [],
+            errorMsg: ''
         }
     },
     methods: {
@@ -71,7 +99,51 @@ export default {
                 alert(`Error importing file: ${error.message}`);
             }
         },
+        async showSchema(tableName) {
+            // const schemaElement = document.getElementById(`schema-${tableName}`)
+            // if (this.schemaElement != tableName && this.schemaElement!= null) 
+            // if (tableName) {
+                try {
+                    const result = await this.conn.query(`DESCRIBE ${tableName};`)
+                    this.schemaData = result.toArray()
+                    console.log(this.schemaData)
+                    this.schemaElement = tableName
+                } catch (error) {
+                    console.error('Error fetching schema:', error)
+                    this.errorMsg = 'Error fetching schema'
+                }
+            // } else {
+            //     this.schemaElement = null
+            // }
+        },
+        showRenameForm(tableName) {
+            const renameForm = document.getElementById(`rename-form-${tableName}`)
+            renameForm.style.display =
+            renameForm.style.display === 'none' ? 'flex' : 'none'
+        },
+        async renameTable(oldTableName) {
+            const newNameInput = document.getElementById(`new-name-${oldTableName}`)
+            const newTableName = newNameInput.value.trim()
 
+            if (newTableName && newTableName !== oldTableName) {
+                try {
+                await conn.query(`ALTER TABLE ${oldTableName} RENAME TO ${newTableName};`)
+                const fileIndex = this.importedFiles.findIndex(
+                    (file) => file.tableName === oldTableName
+                )
+                if (fileIndex !== -1) {
+                    this.importedFiles[fileIndex].tableName = newTableName
+                }
+                this.updateFileList()
+                alert(`Table renamed from ${oldTableName} to ${newTableName}`)
+                } catch (error) {
+                    console.error('Error renaming table:', error)
+                    alert(`Error renaming table: ${error.message}`)
+                }
+            } else {
+                alert('Please enter a valid new table name')
+            }
+        }        
       },
 }
 </script>

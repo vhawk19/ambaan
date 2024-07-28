@@ -1,11 +1,10 @@
 <template>
     <textarea :id="`${blockId}-input`" rows="5" placeholder="Enter your SQL query here"></textarea>
     <button v-on:click="runQueryBlock(blockId)">Run Query</button>
-    <button :id="`${blockId}-export`" style="display: none;">Export as CSV</button>
-    <div class="output-block" :id="`${blockId}-output`">
+    <button :id="`${blockId}-export`" style="">Export as CSV</button>
+    <div v-if="displayOutput" class="output-block" :id="`${blockId}-output`">
         <div v-if="isError">{{ errorMsg }}</div>
-        <div v-if="data.length===0"> Query returned no results </div>
-        <div> Chumma Result</div>
+        <!-- <div v-if="data.length===0"> Query returned no results </div> -->
         <table>
             <thead>
             <tr>
@@ -34,7 +33,8 @@ export default {
         data: [],
         tableHtmlText: '',
         isError: false,
-        errorMsg: ''
+        errorMsg: '',
+        displayOutput: false
         }
     },
     props: {
@@ -55,6 +55,7 @@ export default {
                     }
                     return newRow;
                 });
+                this.displayOutput = true
                 console.log("data", this.data)
                 this.displayTable(this.data, outputElement, exportButton);
                 exportButton.onclick = () => exportCSV(this.data);
@@ -109,6 +110,8 @@ export default {
             this.headers = Object.keys(data[0]);
 
         },
+
+        
     }
 
 }

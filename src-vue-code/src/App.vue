@@ -1,5 +1,5 @@
 <template>
-    <NuxtRouteAnnouncer />
+    <!-- <NuxtRouteAnnouncer /> -->
     <div class="container">
             <DataCatalog />
             <QueryWorkspace />
@@ -15,19 +15,21 @@
         padding: 0;
         height: 100%;
         line-height: 1.6;
+        max-width: 100%;
     }
     .container {
         display: flex;
         height: 100%;
+        width: 100vw;
     }
     .data-catalog {
-        width: 30%;
+        max-width: 30%;
         background-color: #f0f0f0;
         padding: 20px;
         overflow-y: auto;
     }
     .query-workspace {
-        width: 70%;
+        width: 60%;
         padding: 20px;
         overflow-y: auto;
     }
@@ -40,6 +42,7 @@
         width: 100%;
         padding: 10px;
         margin-bottom: 10px;
+        margin-top: 40px;
     }
     button {
         padding: 10px 20px;
@@ -74,6 +77,7 @@
         border-radius: 4px;
         padding: 10px;
         margin-bottom: 20px;
+        margin-top: 20px;
     }
     .output-block {
         background-color: #fff;
@@ -96,6 +100,7 @@
         color: #666;
         padding: 10px;
         cursor: pointer;
+        margin-top: 50px;
     }
     .add-query-btn:hover {
         background-color: #e0e0e0;
