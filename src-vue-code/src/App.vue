@@ -48,6 +48,7 @@
           </div>
         </div>
       </div>
+      <Footer></Footer>
     </div>
   </template>
   
@@ -56,13 +57,15 @@
   import QueryWorkspace from './components/QueryWorkspace.vue';
   import DisplayPane from './components/DisplayPane.vue';
   import Header from './components/Header.vue'
+  import Footer from './components/Footer.vue'
   
   export default {
     components: {
       DataCatalog,
       QueryWorkspace,
       DisplayPane,
-      Header
+      Header,
+      Footer,
     },
     data() {
       return {
