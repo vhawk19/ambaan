@@ -1,5 +1,6 @@
 <template>
     <div class="app-container m-0">
+      <Header ></Header>
       <div class="flex h-screen w-full overflow-hidden bg-gray-900 text-white">
         <!-- Data Catalog -->
         <div 
@@ -54,12 +55,14 @@
   import DataCatalog from './components/DataCatalog.vue';
   import QueryWorkspace from './components/QueryWorkspace.vue';
   import DisplayPane from './components/DisplayPane.vue';
+  import Header from './components/Header.vue'
   
   export default {
     components: {
       DataCatalog,
       QueryWorkspace,
       DisplayPane,
+      Header
     },
     data() {
       return {
