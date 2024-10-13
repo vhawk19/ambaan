@@ -5,6 +5,7 @@
       rows="5"
       class="w-full p-2 mb-4 border border-gray-300 rounded bg-gray-800 text-white resize-vertical"
       placeholder="Enter your SQL query here"
+      @keydown.ctrl.enter="runQueryBlock"
     ></textarea>
     <div class="flex space-x-4 mb-4">
       <font-awesome-icon
@@ -32,19 +33,19 @@
         <div class="flex space-x-4">
           <button
             @click="addVisualization"
-            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+            class="border-white border-solid border-2 text-white hover:bg-gray-500 font-bold py-2 px-4 rounded"
           >
             Add Visualization
           </button>
           <button
             @click="addToDisplayPane"
-            class="bg-white text-green-600 font-bold py-2 px-4 rounded"
+            class="border-white border-solid border-2 text-white hover:bg-gray-500 font-bold py-2 px-4 rounded"
           >
             Add to Display Pane
           </button>
           <button
             @click="exportToCSV"
-            class="bg-white text-green-600 font-bold py-2 px-4 rounded"
+            class="border-white border-solid border-2 text-white hover:bg-gray-500 font-bold py-2 px-4 rounded"
           >
             Export as CSV
           </button>

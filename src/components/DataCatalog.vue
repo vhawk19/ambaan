@@ -62,7 +62,7 @@
             <div v-if="file.showOptions" class="table-actions mt-2 space-y-2">
               <button
                 @click="showSchema(file.tableName)"
-                class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded text-sm"
+                class="border-white border-solid border-2 text-white hover:bg-gray-500 font-bold py-2 px-4 rounded w-full"
               >
                 {{ file.showSchema ? "Hide" : "Show" }} Schema
               </button>
