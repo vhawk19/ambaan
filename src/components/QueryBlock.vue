@@ -107,21 +107,23 @@
           v-if="block.result && block.result.length > 0"
           class="flex justify-center items-center mt-4"
         >
-          <button
+          <font-awesome-icon
+            icon="fa-solid fa-circle-arrow-left"
+            size="2xl"
+            style="color: #ffffff"
             @click="prevPage"
             :disabled="currentPage === 1"
-            class="bg-white text-green-600 font-bold py-2 px-4 rounded mr-2 disabled:opacity-50"
-          >
-            Previous
-          </button>
+            cursor="pointer"
+          />
           <span class="mx-2">Page {{ currentPage }} of {{ totalPages }}</span>
-          <button
+          <font-awesome-icon
+            icon="fa-solid fa-circle-arrow-right"
+            size="2xl"
+            style="color: #ffffff"
             @click="nextPage"
             :disabled="currentPage === totalPages"
-            class="bg-white text-green-600 font-bold py-2 px-4 rounded ml-2 disabled:opacity-50"
-          >
-            Next
-          </button>
+            cursor="pointer"
+          />
         </div>
       </div>
       <div v-for="viz in visualizations" :key="viz.id" v-show="activeTab === viz.id">
